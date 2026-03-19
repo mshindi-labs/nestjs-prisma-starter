@@ -215,4 +215,4 @@ Feature-specific docs that already exist:
 
 ## License
 
-`UNLICENSED` (as defined in `package.json`).
+`MIT`
