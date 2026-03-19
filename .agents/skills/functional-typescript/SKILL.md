@@ -1,0 +1,113 @@
+---
+name: functional-typescript
+description: >
+  Functional programming patterns for TypeScript and JavaScript. Use this skill
+  when writing or reviewing code that should follow FP principles: pure
+  functions, immutability, closures, partial application, currying, function
+  composition, higher-order functions, and the module pattern. Also use for
+  TypeScript types that support FP: Result, Option, discriminated unions,
+  Readonly, and generic HOF signatures. Trigger on questions like "how do I
+  avoid mutation", "how do I curry this", "how should I structure this module",
+  "how do I type a higher-order function", or any request to make code more
+  functional.
+license: MIT
+metadata:
+  author: mshindi-labs
+  version: "1.0.0"
+---
+
+# Functional TypeScript
+
+Comprehensive guide to writing idiomatic functional TypeScript and JavaScript.
+Contains 20 rules across 7 categories, grounded in *You Don't Know JS Yet*
+(YDKJSY) and extended with TypeScript type system patterns.
+
+## When to Apply
+
+Reference these guidelines when:
+- Writing new TypeScript or JavaScript functions
+- Reviewing code for mutation, side effects, or imperative patterns
+- Designing module APIs or encapsulated state
+- Implementing data transformation pipelines
+- Handling errors and nullable values without exceptions or null checks
+
+## Rule Categories by Priority
+
+| Priority | Category | Impact | Prefix |
+|----------|----------|--------|--------|
+| 1 | Core Principles | CRITICAL | `core-` |
+| 2 | Immutability | CRITICAL | `immut-` |
+| 3 | Closures & Scope | HIGH | `closure-` |
+| 4 | Function Patterns | HIGH | `fn-` |
+| 5 | Module Pattern | MEDIUM-HIGH | `module-` |
+| 6 | TypeScript FP Types | MEDIUM | `types-` |
+| 7 | Code Style | LOW-MEDIUM | `style-` |
+
+## Quick Reference
+
+### 1. Core Principles (CRITICAL)
+
+- `core-pure-functions` — return same output for same inputs; no side effects
+- `core-side-effect-isolation` — functional core, imperative shell
+- `core-referential-transparency` — inject `Date.now()`, `Math.random()`, and other hidden inputs
+
+### 2. Immutability (CRITICAL)
+
+- `immut-avoid-mutation` — never mutate arguments; use spread and map
+- `immut-readonly-types` — annotate params with `Readonly<T>` and `readonly T[]`
+- `immut-const-assertion` — use `as const` for literal types; prefer over `enum`
+- `immut-spread-over-push` — use `toSorted`, `toReversed`, spread instead of `sort`, `push`, `splice`
+
+### 3. Closures & Scope (HIGH)
+
+- `closure-encapsulate-state` — closures for private state without classes
+- `closure-loop-pitfall` — use `let` (not `var`) in loops; prefer array methods
+- `closure-memoize` — memoize pure functions with closure-private cache
+
+### 4. Function Patterns (HIGH)
+
+- `fn-partial-application` — pre-fill arguments; return specialised functions
+- `fn-currying` — one argument at a time; put config first, data last
+- `fn-composition-pipe` — replace nested calls with `pipe`
+- `fn-higher-order` — `map`/`filter`/`reduce` over imperative loops
+- `fn-point-free` — pass function references directly; eliminate wrapper lambdas
+
+### 5. Module Pattern (MEDIUM-HIGH)
+
+- `module-iife-singleton` — IIFE for single-instance modules with private state
+- `module-factory` — factory function for multiple independent instances
+- `module-esm-private` — export functions not raw state; unexported = private
+
+### 6. TypeScript FP Types (MEDIUM)
+
+- `types-result` — `Result<T, E>` instead of throwing for expected errors
+- `types-option` — `Option<T>` to make absence explicit
+- `types-discriminated-union` — discriminated unions with exhaustiveness checking
+- `types-type-guard` — reusable `x is T` predicates; use with `filter`
+- `types-hof-generics` — type HOFs with generics; `Transform<A,B>`, `Predicate<T>`
+
+### 7. Code Style (LOW-MEDIUM)
+
+- `style-prefer-functions-over-classes` — factory functions avoid `this` binding bugs
+- `style-naming-conventions` — verbs for functions, `is`/`has` for predicates, `make`/`create` for factories
+
+## How to Use
+
+Read individual rule files for detailed explanations and before/after examples:
+
+```
+rules/core-pure-functions.md
+rules/immut-avoid-mutation.md
+rules/fn-composition-pipe.md
+```
+
+Each rule file contains:
+- Impact level and description
+- Incorrect code example with explanation
+- Correct code example with explanation
+- Real-world patterns and edge cases
+- Reference link
+
+## Full Compiled Guide
+
+For all rules expanded in one document: `AGENTS.md`

@@ -1,0 +1,575 @@
+---
+alwaysApply: true
+---
+
+# NestJS Backend - Cursor Rules
+
+**Stack**: NestJS 11.0.1 | PostgreSQL + Prisma 7.3.0 | Jest + Supertest | pnpm
+
+---
+
+## Project Overview
+
+This is a comprehensive property management API built with:
+
+- **Framework**: NestJS with TypeScript
+- **Database**: PostgreSQL with Prisma ORM
+- **Architecture**: Modular, domain-driven design
+- **Auth**: JWT-based authentication with role-based permissions
+- **Additional**: Socket.io, OpenAI integration, Swagger documentation
+
+## Key Principles
+
+### Code Organization & Architecture
+
+- Follow modular architecture with clear separation of concerns
+- One module per main domain (users, properties, payments, etc.)
+- Each module should contain: controller, service, DTOs, entities
+- Use the existing project structure under `src/` directory
+- Place shared utilities in `src/common/` (decorators, guards, pipes, filters,
+  utils)
+- Keep database models in `prisma/schema.prisma`
+- Generate Prisma client to `generated/prisma/` (not default location)
+
+### NestJS Best Practices
+
+- Use dependency injection extensively
+- Apply guards for authentication/authorization (`@UseGuards`)
+- Use pipes for validation and transformation
+- Implement proper exception handling with custom filters
+- Use decorators for API documentation (`@ApiResponse`, `@ApiOperation`)
+- Follow existing custom decorators pattern (e.g., `@APIResponsesDecorator`)
+
+### TypeScript Standards
+
+- Always declare explicit types for variables, parameters, and return values
+- Avoid `any` type - create proper interfaces/types instead
+- Use strict TypeScript configuration
+- Prefer interfaces over types for object definitions
+- Use enums for fixed sets of values (follow existing Prisma enum patterns)
+- Import types with `import type` when possible
+
+### Functional Programming Principles
+
+- **Immutability First:** Embrace immutable architectures. Avoid `let` and prevent mutation. Heavily utilize `Readonly<T>`, `ReadonlyArray<T>`, and pure immutable methods.
+- **Pure Functions:** Decouple core business logic into pure functions extracted from side-effects or stateful service instances.
+- **Function Composition:** Actively implement higher-order functions (HOFs), closures, and partial application/currying where it enhances reusability and declarative logic.
+- **Explicit States:** Make illegal states unrepresentable using Discriminated Unions (like `Result<T, E>` or `Option<T>` patterns).
+- **Exhaustive Handling:** Leverage `switch` statements or matchers for strict compile-time exhaustiveness checks over discriminated unions.
+
+### Database & Prisma Patterns
+
+- Use UUID for all primary keys (existing pattern: `@id @default(uuid())`)
+- Include audit fields on all models: `created_by`, `updated_by`, `created_at`,
+  `updated_at`
+- Establish proper relations with foreign keys
+- Use Prisma enums for status/category fields
+- Generate client with `npx prisma generate` after schema changes
+- Use transactions for complex operations
+- Handle database errors gracefully with try-catch blocks
+
+### File & Naming Conventions
+
+- Use kebab-case for file and directory names
+- Use PascalCase for classes, interfaces, enums
+- Use camelCase for variables, functions, methods, and properties
+- Use SCREAMING_SNAKE_CASE for constants and environment variables
+- Start function names with verbs (create, update, find, delete, etc.)
+- Use descriptive names - avoid abbreviations
+- Entity files: `*.entity.ts`
+- DTO files: `create-*.dto.ts`, `update-*.dto.ts`
+- Service files: `*.service.ts`
+- Controller files: `*.controller.ts`
+- Module files: `*.module.ts`
+
+### DTOs & Validation
+
+- Use class-validator decorators for input validation
+- Extend `PartialType` for update DTOs
+- Create separate DTOs for different operations (create, update, response)
+- Include proper Swagger decorators (`@ApiProperty`)
+- Follow existing DTO patterns in the codebase
+- Use existing common DTOs like `CreatedByUpdatedByDto`, `PaginatedResponseDto`
+
+### API Design
+
+- Follow RESTful conventions
+- Use proper HTTP status codes
+- Implement consistent error responses
+- Add comprehensive Swagger documentation
+- Use existing custom decorators for API responses
+- Implement pagination for list endpoints using existing `PaginationService`
+- Follow existing API response format patterns
+
+### Error Handling
+
+- Use NestJS built-in exceptions (`NotFoundException`, `BadRequestException`,
+  etc.)
+- Implement global exception filters
+- Use existing `raiseHttpError` utility
+- Provide meaningful error messages
+- Log errors appropriately using existing logger utility
+
+### Security
+
+- Validate all inputs using class-validator
+- Use guards for authentication/authorization
+- Follow existing API key guard pattern
+- Implement proper CORS configuration
+- Never expose sensitive information in responses
+- Use existing JWT authentication pattern
+
+### Testing
+
+- Write unit tests for services using Jest
+- Write integration tests for controllers
+- Use proper mocking for external dependencies
+- Follow Arrange-Act-Assert pattern
+- Test both success and error scenarios
+- Aim for high test coverage
+
+### Documentation
+
+- Use JSDoc for public methods and complex logic
+- Keep README.md updated with setup instructions
+- Document environment variables
+- Use Swagger decorators for API documentation
+- Comment complex business logic
+
+### Performance
+
+- Use pagination for large datasets
+- Implement proper database indexing
+- Use select/include judiciously with Prisma queries
+- Consider caching for frequently accessed data
+- Optimize N+1 query problems
+
+### Development Workflow
+
+- Use existing scripts: `pnpm start:dev`, `pnpm build`, `pnpm lint`,
+  `pnpm format`
+- Run database migrations: `npx prisma migrate dev`
+- Seed database: `pnpm seed`
+- Generate Prisma client after schema changes
+- Follow existing Git workflow patterns
+
+## Common Patterns to Follow
+
+### Service Method Structure
+
+```typescript
+async createEntity(createDto: CreateEntityDto, userId: string): Promise<Entity> {
+  try {
+    const entity = await this.prisma.entity.create({
+      data: {
+        ...createDto,
+        created_by: userId,
+        updated_by: userId,
+      },
+    });
+    return entity;
+  } catch (error) {
+    raiseHttpError(error);
+  }
+}
+```
+
+### Controller Method Structure
+
+```typescript
+@Post()
+@APICreateResponsesDecorator([
+  { status: 201, description: 'Entity created successfully', type: Entity },
+])
+async create(
+  @Body() createDto: CreateEntityDto,
+  @User() user: AuthenticatedUser,
+): Promise<Entity> {
+  return this.service.create(createDto, user.id);
+}
+```
+
+### Module Structure
+
+```typescript
+@Module({
+  controllers: [EntityController],
+  providers: [EntityService],
+  imports: [PrismaModule],
+  exports: [EntityService],
+})
+export class EntityModule {}
+```
+
+## Existing Patterns to Maintain
+
+- Custom decorators in `src/common/decorators/`
+- Shared utilities in `src/common/utils/`
+- Pagination service usage
+- Audit trail implementation
+- API response standardization
+- Role-based permission system
+- Seeder pattern in `src/prisma/seeders/`
+
+Remember to:
+
+- Follow the existing codebase patterns and conventions
+- Use the established project structure
+- Leverage existing utilities and decorators
+- Maintain consistency with current code style
+- Test thoroughly before deploying changes
+
+### Naming Principles
+
+- Intention-revealing: `getUserById()` not `getData()`
+- Pronounceable: `createdAt` not `crtdAt`
+- Searchable: `MAX_LOGIN_ATTEMPTS = 3` not magic numbers
+- No encodings: `email` not `strEmail`
+
+### TypeScript Strict
+
+- Explicit return types always
+- No implicit `any`
+- Use `interface` for DTOs
+
+### Dependency Injection
+
+```typescript
+// ✅ Constructor injection
+@Injectable()
+export class UsersService {
+  constructor(private readonly repository: UsersRepository) {}
+}
+```
+
+### Layer Separation
+
+- **Repository**: Prisma queries only
+- **Service**: Business logic + validation
+- **Controller**: HTTP routing only
+
+### Input Validation
+
+```typescript
+export class CreateUserDto {
+  @IsEmail()
+  @Transform(({ value }) => value.toLowerCase().trim())
+  email: string;
+
+  @IsString()
+  @MinLength(2)
+  @MaxLength(100)
+  name: string;
+}
+```
+
+### Error Handling
+
+```typescript
+// Services throw HTTP exceptions
+if (!user) throw new NotFoundException(`User ${id} not found`);
+if (existing) throw new ConflictException('Email in use');
+```
+
+**Exception Map**: `NotFoundException` (404), `ConflictException` (409),
+`BadRequestException` (400), `UnauthorizedException` (401)
+
+---
+
+## 🧪 Testing Patterns
+
+### Unit Test (AAA Pattern)
+
+```typescript
+describe('UsersService', () => {
+  let service: UsersService;
+  let repository: jest.Mocked<UsersRepository>;
+
+  beforeEach(async () => {
+    const module = await Test.createTestingModule({
+      providers: [
+        UsersService,
+        {
+          provide: UsersRepository,
+          useValue: { findById: jest.fn() /* ... */ },
+        },
+      ],
+    }).compile();
+    service = module.get(UsersService);
+    repository = module.get(UsersRepository);
+  });
+
+  it('should return user when found', async () => {
+    repository.findById.mockResolvedValue(mockUser);
+    const result = await service.findById('1');
+    expect(result).toEqual(mockUser);
+  });
+
+  it('should throw NotFoundException when not found', async () => {
+    repository.findById.mockResolvedValue(null);
+    await expect(service.findById('999')).rejects.toThrow(NotFoundException);
+  });
+});
+```
+
+### E2E Test
+
+```typescript
+describe('UsersController (e2e)', () => {
+  let app: INestApplication;
+
+  beforeAll(async () => {
+    const module = await Test.createTestingModule({
+      imports: [AppModule],
+    }).compile();
+    app = module.createNestApplication();
+    app.useGlobalPipes(new ValidationPipe({ whitelist: true }));
+    await app.init();
+  });
+
+  beforeEach(async () => {
+    await prisma.user.deleteMany();
+  });
+
+  it('POST /users - success', () => {
+    return request(app.getHttpServer())
+      .post('/users')
+      .send({ name: 'John', email: 'john@test.com' })
+      .expect(201);
+  });
+
+  it('POST /users - validation error', () => {
+    return request(app.getHttpServer())
+      .post('/users')
+      .send({ email: 'invalid' })
+      .expect(400);
+  });
+});
+```
+
+## 🎯 Cursor Workflows
+
+### Multi-File Edit Order
+
+1. Prisma schema → 2. DTOs → 3. Repository → 4. Service → 5. Controller → 6.
+   Tests
+
+### Feature Generation
+
+**User**: "Generate lessons feature" **Create**: Module, Controller, Service,
+Repository, DTOs (Create/Update/Response), Unit tests
+
+### Test Generation
+
+**User**: Opens file, "Generate unit test" **Create**: `*.spec.ts` with mocked
+dependencies, AAA pattern, success + error cases
+
+---
+
+## 📐 Architecture Rules
+
+### Feature-Led (NOT Technical Layer)
+
+```
+✅ src/users/ (controller, service, repository, dto/, tests)
+❌ src/controllers/, src/services/ (avoid)
+```
+
+---
+
+## 🔄 Common Workflows
+
+### Create Feature Module
+
+1. Update Prisma schema → `pnpm prisma migrate dev --name add_lessons`
+2. Create `src/lessons/` with: module, controller, service, repository, dto/
+3. Wire up in `app.module.ts`
+4. Generate tests
+
+### Add Endpoint
+
+1. Repository:
+   `async findByRole(role: string) { return this.prisma.user.findMany({ where: { role } }); }`
+2. Service:
+   `async findByRole(role: string) { return this.repository.findByRole(role); }`
+3. Controller:
+   `@Get('by-role/:role') async findByRole(@Param('role') role: string) { ... }`
+4. Write tests
+
+### Modify Schema
+
+1. Update `prisma/schema.prisma`
+2. `pnpm prisma migrate dev --name description`
+3. Update DTOs/entities if needed
+4. Update tests
+
+---
+
+## 🧠 Procedural Knowledge & `@skills` Integration
+
+This repository leverages the **`@skills` directory** extensively (located in `.agents/skills/`) as the source of truth for programmatic standards.
+
+> **MANDATORY**: Consult the procedural knowledge mapped to these skills *before* generating or refactoring code. Do not hallucinate patterns; read the skill files to fetch the correct patterns and principles.
+
+| Skill                                  | Path                                                       | Procedural Application / When to consult                                                                     |
+| -------------------------------------- | ---------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------ |
+| **Functional TypeScript**              | `.agents/skills/functional-typescript/SKILL.md`            | **Mandatory default.** Functional paradigms, higher-order functions, currying, pure functions, closures.     |
+| **TypeScript Best Practices**          | `.agents/skills/typescript-best-practices/SKILL.md`        | Type-first design, making illegal states unrepresentable, discriminated unions, runtime validation guardrails. |
+| **TypeScript Expert**                  | `.agents/skills/typescript-expert/SKILL.md`                | Advanced typing, optimizations, and deep language tooling.                                                   |
+| **NestJS Best Practices** (index)      | `.agents/skills/nestjs-best-practices/SKILL.md`            | Quick rule-name lookup for architecture, dependency injection, architecture patterns.                        |
+| **NestJS Expert**                      | `.agents/skills/nestjs-expert/SKILL.md`                    | Advanced patterns (Auth, microservices, testing edge-cases).                                                 |
+| **Testing with Jest**                  | `.agents/skills/javascript-typescript-jest/SKILL.md`       | AAA testing pattern, exact Mock procedures, testing closures & pure functions.                               |
+| **Architecture Modules** `arch-*`      | `.agents/skills/nestjs-best-practices/rules/arch-*.md`     | Restructuring modules, dependency avoidance, repository patterns, logic decoupling.                          |
+| **Dependency Injection** `di-*`        | `.agents/skills/nestjs-best-practices/rules/di-*.md`       | Constructor injection, provider scopes (singleton/request/transient), injection tokens for interfaces        |
+| **Error Handling** `error-*`           | `.agents/skills/nestjs-best-practices/rules/error-*.md`    | Exception filters, throwing HTTP exceptions from services, safe async/background error handling              |
+| **Security Standards** `security-*`    | `.agents/skills/nestjs-best-practices/rules/security-*.md` | JWT configurations, DTO validations, guards, and safety bounds.                                              |
+| **Performance Patterns** `perf-*`      | `.agents/skills/nestjs-best-practices/rules/perf-*.md`     | DB indexing, async hooks, caching strategies.                                                                |
+| **Find Skills Utility**                | `.agents/skills/find-skills/SKILL.md`                      | When looking for an installable capability or new workflow.                                                  |
+
+### How to apply skill rules
+
+1. **Identify the category** of the task (architecture change → `arch-*`, new auth flow → `security-*`, etc.)
+2. **Open the matching rule file** and read the _incorrect_ example first — verify the current code doesn't match it.
+3. **Generate code that matches the _correct_ example**, adapting to project-specific patterns (Prisma, `PaginationService`, `raiseHttpError`).
+4. **Cross-check impact rating** — CRITICAL rules must never be violated; HIGH rules require a comment if deviated from.
+
+---
+
+## 📝 Code Templates
+
+### Controller (CRUD)
+
+```typescript
+@Controller('users')
+export class UsersController {
+  constructor(private readonly service: UsersService) {}
+
+  @Get()
+  findAll(
+    @Query('skip', new DefaultValuePipe(0), ParseIntPipe) skip?: number,
+  ): Promise<UserResponseDto[]> {
+    return this.service.findAll(skip);
+  }
+
+  @Get(':id')
+  findOne(@Param('id') id: string): Promise<UserResponseDto> {
+    return this.service.findById(id);
+  }
+
+  @Post()
+  create(@Body() dto: CreateUserDto): Promise<UserResponseDto> {
+    return this.service.create(dto);
+  }
+
+  @Patch(':id')
+  update(
+    @Param('id') id: string,
+    @Body() dto: UpdateUserDto,
+  ): Promise<UserResponseDto> {
+    return this.service.update(id, dto);
+  }
+
+  @Delete(':id')
+  @HttpCode(204)
+  remove(@Param('id') id: string): Promise<void> {
+    return this.service.remove(id);
+  }
+}
+```
+
+### Service (Business Logic)
+
+```typescript
+@Injectable()
+export class UsersService {
+  constructor(private readonly repository: UsersRepository) {}
+
+  async findById(id: string): Promise<User> {
+    const user = await this.repository.findById(id);
+    if (!user) throw new NotFoundException(`User ${id} not found`);
+    return user;
+  }
+
+  async create(dto: CreateUserDto): Promise<User> {
+    const existing = await this.repository.findByEmail(dto.email);
+    if (existing) throw new ConflictException('Email in use');
+    return this.repository.save(dto);
+  }
+
+  async update(id: string, dto: UpdateUserDto): Promise<User> {
+    await this.findById(id); // Ensure exists
+    return this.repository.update(id, dto);
+  }
+}
+```
+
+### Repository (Data Access)
+
+```typescript
+@Injectable()
+export class UsersRepository {
+  constructor(private readonly prisma: PrismaService) {}
+
+  async findAll(skip?: number, take?: number): Promise<User[]> {
+    return this.prisma.user.findMany({
+      skip,
+      take,
+      orderBy: { createdAt: 'desc' },
+    });
+  }
+
+  async findById(id: string): Promise<User | null> {
+    return this.prisma.user.findUnique({ where: { id } });
+  }
+
+  async save(data: CreateUserDto): Promise<User> {
+    return this.prisma.user.create({ data });
+  }
+
+  async update(id: string, data: UpdateUserDto): Promise<User> {
+    return this.prisma.user.update({ where: { id }, data });
+  }
+}
+```
+
+---
+
+## ⚡ Quick Commands
+
+```bash
+# Development
+pnpm start:dev            # Hot-reload dev server
+
+# Testing
+pnpm test                 # Unit tests
+pnpm test:watch           # Watch mode
+pnpm test:cov             # Coverage report
+pnpm test:e2e             # E2E tests
+
+# Database
+pnpm prisma migrate dev   # Create and apply migration
+pnpm prisma studio        # Database GUI
+pnpm prisma generate      # Regenerate client
+
+# Code Quality
+pnpm lint                 # ESLint check
+pnpm format               # Prettier format
+
+# Build
+pnpm build                # Production build
+```
+
+---
+
+## 🎯 Checklist
+
+When generating code:
+
+- [ ] Feature-led structure (`src/feature/`)
+- [ ] Apply the 7 variable naming principles
+- [ ] Constructor injection
+- [ ] Input validation (DTOs)
+- [ ] HTTP exceptions in services
+- [ ] Explicit return types
+- [ ] Unit + E2E tests
+- [ ] Follow existing patterns
