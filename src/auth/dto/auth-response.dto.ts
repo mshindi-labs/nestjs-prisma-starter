@@ -1,0 +1,60 @@
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
+import { AccountType } from 'generated/prisma/client';
+import { UserResponseDto } from '../../users/dto/user-response.dto';
+
+export class AuthResponseDto {
+  accessToken: string;
+  refreshToken: string;
+  user: UserResponseDto;
+}
+
+/**
+ * Full current user response: account fields at top level with user nested.
+ * Password is never included.
+ */
+export class CurrentUserResponseDto {
+  @ApiProperty({ description: 'Account ID', example: 'uuid' })
+  id: string;
+
+  @ApiProperty({ description: 'User ID', example: 1 })
+  userId: number;
+
+  @ApiPropertyOptional({ description: 'Email address', nullable: true })
+  email: string | null;
+
+  @ApiPropertyOptional({ description: 'Phone number (MSISDN)', nullable: true })
+  msisdn: string | null;
+
+  @ApiProperty({ description: 'Account type', enum: AccountType })
+  accountType: AccountType;
+
+  @ApiProperty({ description: 'Whether email is verified' })
+  isEmailVerified: boolean;
+
+  @ApiProperty({ description: 'Whether phone number is verified' })
+  isMsisdnVerified: boolean;
+
+  @ApiProperty({ description: 'Whether account is active' })
+  isActive: boolean;
+
+  @ApiProperty({ description: 'Account creation timestamp' })
+  createdAt: Date;
+
+  @ApiProperty({ description: 'Account last update timestamp' })
+  updatedAt: Date;
+
+  @ApiProperty({ description: 'User details', type: UserResponseDto })
+  user: UserResponseDto;
+
+  @ApiPropertyOptional({ description: 'User role (convenience)', type: Object })
+  role?: { id: number; name: string; createdAt: Date; updatedAt: Date };
+}
+
+export interface JwtPayload {
+  sub: number; // userId
+  accountId: string;
+  email?: string;
+  msisdn?: string;
+  iat?: number;
+  exp?: number;
+}

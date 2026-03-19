@@ -1,12 +1,33 @@
-import { Controller, Get } from '@nestjs/common';
+import { Controller, Get, VERSION_NEUTRAL } from '@nestjs/common';
+import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { AppService } from './app.service';
+import { AppHealthDto } from './common/dto/app-health.dto';
+import { Public } from './auth/guards/public.decorator';
+import { Open } from './auth/guards/open.decorator';
 
-@Controller()
+@ApiTags('app')
+@Controller({ version: VERSION_NEUTRAL })
 export class AppController {
   constructor(private readonly appService: AppService) {}
 
   @Get()
-  getHello(): string {
-    return this.appService.getHello();
+  @Public()
+  @Open()
+  @ApiOperation({ summary: 'Get root endpoint' })
+  getRoot(): { message: string } {
+    return this.appService.getRoot();
+  }
+
+  @Get('health')
+  @Public()
+  @Open()
+  @ApiOperation({ summary: 'Get application health status' })
+  @ApiResponse({
+    status: 200,
+    description: 'Health check information',
+    type: AppHealthDto,
+  })
+  getHealth(): AppHealthDto {
+    return this.appService.getHealth();
   }
 }
