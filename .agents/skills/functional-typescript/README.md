@@ -10,8 +10,8 @@ application, currying, higher-order functions, function composition, and the
 module pattern — using TypeScript's type system to make those patterns safe and
 expressive.
 
-The skill draws on patterns from *You Don't Know JS Yet* (YDKJSY) for deep JS
-foundations, extended with TypeScript-specific types and idioms.
+The skill draws on patterns from [_You Don't Know JS Yet_](https://github.com/getify/you-dont-know-js)
+by Kyle Simpson for deep JS foundations, extended with TypeScript-specific types and idioms.
 
 ## Contents
 

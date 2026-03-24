@@ -94,7 +94,7 @@
     "functional-typescript": {
       "source": "mshindi-labs/agent-skills",
       "sourceType": "github",
-      "computedHash": "8127626c6b165d37d2184c760d48d7e392b60b93c527732d1022aa48fd2c867a"
+      "computedHash": "c7e408baa0b00913433ed82fe3a3de01fe183c54b6c52997d7c75bb0e58a4b16"
     },
     "javascript-typescript-jest": {
       "source": "github/awesome-copilot",

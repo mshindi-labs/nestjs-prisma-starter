@@ -1,6 +1,6 @@
 # The Module Pattern
 
-Source: *You Don't Know JS Yet — Scope & Closures*, Chapter 8
+Source: [_You Don't Know JS Yet_](https://github.com/getify/you-dont-know-js) by Kyle Simpson — Scope & Closures, Chapter 8
 
 ---
 
@@ -29,21 +29,21 @@ Use when you need exactly one instance:
 const StudentModule = (() => {
   // private — not accessible from outside
   const records = [
-    { id: 14, name: "Kyle",  grade: 86 },
-    { id: 73, name: "Suzy",  grade: 87 },
-    { id: 112, name: "Frank", grade: 75 },
-    { id: 6,   name: "Sarah", grade: 91 },
+    { id: 14, name: 'Kyle', grade: 86 },
+    { id: 73, name: 'Suzy', grade: 87 },
+    { id: 112, name: 'Frank', grade: 75 },
+    { id: 6, name: 'Sarah', grade: 91 },
   ];
 
   function getName(studentID: number): string | undefined {
-    return records.find(s => s.id === studentID)?.name;
+    return records.find((s) => s.id === studentID)?.name;
   }
 
   // public API
   return { getName };
 })();
 
-StudentModule.getName(73);      // "Suzy"
+StudentModule.getName(73); // "Suzy"
 (StudentModule as any).records; // undefined — private
 ```
 
@@ -61,10 +61,18 @@ function makeCounter(start = 0) {
   let count = start; // private
 
   return {
-    increment(): void { count++; },
-    decrement(): void { count--; },
-    reset(): void    { count = start; },
-    value(): number  { return count; },
+    increment(): void {
+      count++;
+    },
+    decrement(): void {
+      count--;
+    },
+    reset(): void {
+      count = start;
+    },
+    value(): number {
+      return count;
+    },
   };
 }
 
@@ -130,13 +138,13 @@ by default.
 
 // private — not exported
 const records = [
-  { id: 14, name: "Kyle" },
-  { id: 73, name: "Suzy" },
+  { id: 14, name: 'Kyle' },
+  { id: 73, name: 'Suzy' },
 ];
 
 // public API — exported
 export function getName(studentID: number): string | undefined {
-  return records.find(s => s.id === studentID)?.name;
+  return records.find((s) => s.id === studentID)?.name;
 }
 
 export function getAll(): typeof records {
@@ -146,7 +154,7 @@ export function getAll(): typeof records {
 
 ```ts
 // main.ts
-import { getName } from "./student.js";
+import { getName } from './student.js';
 getName(73); // "Suzy"
 ```
 
@@ -154,6 +162,7 @@ ESM is the preferred format for new TypeScript projects. The module system
 enforces the public/private boundary at the file level — no IIFE needed.
 
 **Key rules for FP-style ESM modules:**
+
 - Export functions, not mutable state
 - If state must be shared, export functions that read/update it (never the
   raw variable)
@@ -166,12 +175,12 @@ enforces the public/private boundary at the file level — no IIFE needed.
 ```ts
 // student.js (CommonJS)
 const records = [
-  { id: 14, name: "Kyle" },
-  { id: 73, name: "Suzy" },
+  { id: 14, name: 'Kyle' },
+  { id: 73, name: 'Suzy' },
 ];
 
 function getName(studentID) {
-  return records.find(s => s.id === studentID)?.name;
+  return records.find((s) => s.id === studentID)?.name;
 }
 
 module.exports = { getName };
@@ -179,7 +188,7 @@ module.exports = { getName };
 
 ```ts
 // main.js
-const { getName } = require("./student");
+const { getName } = require('./student');
 getName(73); // "Suzy"
 ```
 
@@ -190,13 +199,13 @@ with `"module": "commonjs"` in tsconfig.
 
 ## Choosing the Right Pattern
 
-| Situation | Pattern |
-|-----------|---------|
-| One-time setup, single shared instance | IIFE module |
-| Independent copies of the same logic | Module factory |
-| File-level organization, tree-shaking | ESM (preferred) |
-| Node.js without ESM support | CommonJS |
-| No state, just utility functions | Plain object namespace |
+| Situation                              | Pattern                |
+| -------------------------------------- | ---------------------- |
+| One-time setup, single shared instance | IIFE module            |
+| Independent copies of the same logic   | Module factory         |
+| File-level organization, tree-shaking  | ESM (preferred)        |
+| Node.js without ESM support            | CommonJS               |
+| No state, just utility functions       | Plain object namespace |
 
 ---
 
@@ -213,8 +222,12 @@ const BadModule = (() => {
 const GoodModule = (() => {
   let count = 0;
   return {
-    increment() { count++; },
-    get() { return count; },
+    increment() {
+      count++;
+    },
+    get() {
+      return count;
+    },
   };
 })();
 

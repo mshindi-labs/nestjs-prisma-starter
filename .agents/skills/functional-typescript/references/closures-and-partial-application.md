@@ -1,19 +1,19 @@
 # Closures & Partial Application
 
-Source: *You Don't Know JS Yet — Scope & Closures*, Chapter 7
+Source: [_You Don't Know JS Yet_](https://github.com/getify/you-dont-know-js) by Kyle Simpson — Scope & Closures, Chapter 7
 
 ---
 
 ## What Is a Closure?
 
-Closure is a behavior of functions. A function instance *closes over* variables
+Closure is a behavior of functions. A function instance _closes over_ variables
 from its defining scope, preserving access to those variables even after the
 outer scope has finished executing.
 
 > "Closure is one of the most important language characteristics ever invented
 > in programming — it underlies major programming paradigms, including
 > Functional Programming (FP), modules, and even a bit of class-oriented
-> design." — YDKJSY
+> design." — [You Don't Know JS Yet](https://github.com/getify/you-dont-know-js)
 
 Two models for thinking about closure:
 
@@ -37,8 +37,8 @@ const add10To = adder(10);
 const add42To = adder(42);
 
 add10To(15); // 25
-add42To(9);  // 51
-add10To(3);  // 13
+add42To(9); // 51
+add10To(3); // 13
 ```
 
 Each call to `adder` produces a separate `addTo` instance. Each instance
@@ -91,17 +91,17 @@ function partial<A extends unknown[], B extends unknown[], R>(
 
 const multiply = (x: number, y: number) => x * y;
 const double = partial(multiply, 2);
-double(5);  // 10
+double(5); // 10
 double(21); // 42
 ```
 
-From YDKJSY — the event handler pattern:
+From [You Don't Know JS Yet](https://github.com/getify/you-dont-know-js) — the event handler pattern:
 
 ```ts
 function defineHandler(requestURL: string, requestData: unknown) {
   return function makeRequest(_evt: Event) {
     fetch(requestURL, {
-      method: "POST",
+      method: 'POST',
       body: JSON.stringify(requestData),
     });
   };
@@ -109,11 +109,8 @@ function defineHandler(requestURL: string, requestData: unknown) {
 
 function setupButtonHandler(btn: HTMLButtonElement) {
   const recordKind = btn.dataset.kind!;
-  const handler = defineHandler(
-    `/api/${recordKind}`,
-    { type: recordKind }
-  );
-  btn.addEventListener("click", handler);
+  const handler = defineHandler(`/api/${recordKind}`, { type: recordKind });
+  btn.addEventListener('click', handler);
 }
 ```
 
@@ -132,7 +129,7 @@ are supplied.
 // Manual curry
 const add = (a: number) => (b: number) => a + b;
 const add5 = add(5);
-add5(3);  // 8
+add5(3); // 8
 add5(10); // 15
 
 // Generic curry helper (2-arg)
@@ -153,8 +150,9 @@ const halve = divideBy(2);
 ```
 
 **Partial application vs currying:**
-- Partial application: fix *any number* of arguments at once
-- Currying: always fix exactly *one* argument at a time
+
+- Partial application: fix _any number_ of arguments at once
+- Currying: always fix exactly _one_ argument at a time
 
 Both rely on closure to preserve the provided arguments.
 
@@ -166,7 +164,7 @@ Closures are the natural place to cache results:
 
 ```ts
 function memoize<A extends unknown[], R>(
-  fn: (...args: A) => R
+  fn: (...args: A) => R,
 ): (...args: A) => R {
   const cache = new Map<string, R>();
 
@@ -193,7 +191,7 @@ This is the module pattern applied at the function level.
 
 ---
 
-## Benefits of Closures (from YDKJSY)
+## Benefits of Closures (from [You Don't Know JS Yet](https://github.com/getify/you-dont-know-js))
 
 1. **Efficiency** — remember previously determined information instead of
    recomputing each time

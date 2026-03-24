@@ -6,25 +6,29 @@ description: >
   functions, immutability, closures, partial application, currying, function
   composition, higher-order functions, and the module pattern. Also use for
   TypeScript types that support FP: Result, Option, discriminated unions,
-  Readonly, and generic HOF signatures. Trigger on questions like "how do I
-  avoid mutation", "how do I curry this", "how should I structure this module",
-  "how do I type a higher-order function", or any request to make code more
-  functional.
+  Readonly, and generic HOF signatures. When the codebase imports from fp-ts/*,
+  also apply the fp-ts library rules: pipe/flow composition, Option, Either,
+  TaskEither, and Do notation. Trigger on questions like "how do I avoid
+  mutation", "how do I curry this", "how should I structure this module",
+  "how do I type a higher-order function", "how do I handle async errors without
+  try-catch", or any request to make code more functional.
 license: MIT
 metadata:
   author: mshindi-labs
-  version: "1.0.0"
+  version: '2.0.0'
 ---
 
 # Functional TypeScript
 
 Comprehensive guide to writing idiomatic functional TypeScript and JavaScript.
-Contains 20 rules across 7 categories, grounded in *You Don't Know JS Yet*
-(YDKJSY) and extended with TypeScript type system patterns.
+Contains 20 rules across 7 categories, grounded in
+[_You Don't Know JS Yet_](https://github.com/getify/you-dont-know-js) by Kyle Simpson,
+extended with TypeScript type system patterns.
 
 ## When to Apply
 
 Reference these guidelines when:
+
 - Writing new TypeScript or JavaScript functions
 - Reviewing code for mutation, side effects, or imperative patterns
 - Designing module APIs or encapsulated state
@@ -33,15 +37,16 @@ Reference these guidelines when:
 
 ## Rule Categories by Priority
 
-| Priority | Category | Impact | Prefix |
-|----------|----------|--------|--------|
-| 1 | Core Principles | CRITICAL | `core-` |
-| 2 | Immutability | CRITICAL | `immut-` |
-| 3 | Closures & Scope | HIGH | `closure-` |
-| 4 | Function Patterns | HIGH | `fn-` |
-| 5 | Module Pattern | MEDIUM-HIGH | `module-` |
-| 6 | TypeScript FP Types | MEDIUM | `types-` |
-| 7 | Code Style | LOW-MEDIUM | `style-` |
+| Priority | Category            | Impact                    | Prefix     |
+| -------- | ------------------- | ------------------------- | ---------- |
+| 1        | Core Principles     | CRITICAL                  | `core-`    |
+| 2        | Immutability        | CRITICAL                  | `immut-`   |
+| 3        | Closures & Scope    | HIGH                      | `closure-` |
+| 4        | Function Patterns   | HIGH                      | `fn-`      |
+| 5        | Module Pattern      | MEDIUM-HIGH               | `module-`  |
+| 6        | TypeScript FP Types | MEDIUM                    | `types-`   |
+| 7        | Code Style          | LOW-MEDIUM                | `style-`   |
+| 8        | fp-ts Library       | HIGH (when fp-ts present) | `fp-ts-`   |
 
 ## Quick Reference
 
@@ -91,6 +96,15 @@ Reference these guidelines when:
 - `style-prefer-functions-over-classes` — factory functions avoid `this` binding bugs
 - `style-naming-conventions` — verbs for functions, `is`/`has` for predicates, `make`/`create` for factories
 
+### 8. fp-ts Library (HIGH — when `fp-ts` is present)
+
+Apply when the codebase imports from `fp-ts/*`.
+
+- `fp-ts-pipe-flow` — `pipe` for immediate transforms; `flow` for reusable functions
+- `fp-ts-option-either` — `Option<T>` for absence; `Either<E, A>` for typed errors; accumulate all errors with `getApplicativeValidation`
+- `fp-ts-taskeither` — `TaskEither<E, A>` for async; `tryCatch`, `chain`, `traverseArray`, `orElse`, `fold`
+- `fp-ts-do-notation` — `Do + bind + apS + bindTo` for multi-step workflows; `bind` when step depends on prior values, `apS` when independent
+
 ## How to Use
 
 Read individual rule files for detailed explanations and before/after examples:
@@ -99,14 +113,27 @@ Read individual rule files for detailed explanations and before/after examples:
 rules/core-pure-functions.md
 rules/immut-avoid-mutation.md
 rules/fn-composition-pipe.md
+rules/fp-ts-pipe-flow.md
+rules/fp-ts-option-either.md
+rules/fp-ts-taskeither.md
+rules/fp-ts-do-notation.md
 ```
 
 Each rule file contains:
+
 - Impact level and description
 - Incorrect code example with explanation
 - Correct code example with explanation
 - Real-world patterns and edge cases
 - Reference link
+
+## References
+
+- `references/pragmatic-fp.md` — 80/20 guide: when to use FP, when to skip it, common refactors
+- `references/fp-typescript-types.md` — TypeScript type system tools for FP
+- `references/fp-ts-library.md` — fp-ts API cheat sheet (pipe/flow, Option, Either, TaskEither, Do, RTE)
+- `references/closures-and-partial-application.md` — closures, currying, memoization
+- `references/module-pattern.md` — IIFE, factory, ESM encapsulation
 
 ## Full Compiled Guide
 

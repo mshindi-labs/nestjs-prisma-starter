@@ -39,3 +39,8 @@ The section ID (in parentheses) is the filename prefix used to group rules.
 
 **Impact:** LOW-MEDIUM
 **Description:** Point-free style, consistent naming, and avoiding class-based patterns where functions suffice keep FP code concise and composable.
+
+## 8. fp-ts Library (fp-ts)
+
+**Impact:** HIGH (apply when codebase imports from `fp-ts/*`)
+**Description:** The fp-ts library provides battle-tested container types (Option, Either, TaskEither) and composition utilities (pipe, flow) that encode FP patterns with a rich combinator API. These rules cover when and how to use each type, the full async error-handling workflow via TaskEither, and Do notation for multi-step computations. Apply in addition to — not instead of — the vanilla FP rules above.

@@ -14,44 +14,44 @@ tags: closures, loops, var, let, scope
 **Incorrect (`var` — all callbacks share one `i`):**
 
 ```typescript
-const fns: Array<() => number> = []
+const fns: Array<() => number> = [];
 
 for (var i = 0; i < 5; i++) {
-  fns.push(() => i)
+  fns.push(() => i);
 }
 
-fns.map(fn => fn()) // [5, 5, 5, 5, 5] — not [0, 1, 2, 3, 4]
+fns.map((fn) => fn()); // [5, 5, 5, 5, 5] — not [0, 1, 2, 3, 4]
 ```
 
 **Correct (`let` — each iteration gets its own binding):**
 
 ```typescript
-const fns: Array<() => number> = []
+const fns: Array<() => number> = [];
 
 for (let i = 0; i < 5; i++) {
-  fns.push(() => i)
+  fns.push(() => i);
 }
 
-fns.map(fn => fn()) // [0, 1, 2, 3, 4] ✓
+fns.map((fn) => fn()); // [0, 1, 2, 3, 4] ✓
 ```
 
 **Common real-world manifestation — event listeners:**
 
 ```typescript
-const buttons = document.querySelectorAll('button')
+const buttons = document.querySelectorAll('button');
 
 // Incorrect: every click handler logs the same final value of i
 for (var i = 0; i < buttons.length; i++) {
   buttons[i].addEventListener('click', () => {
-    console.log(`Button ${i} clicked`) // always logs buttons.length
-  })
+    console.log(`Button ${i} clicked`); // always logs buttons.length
+  });
 }
 
 // Correct: each handler captures its own i
 for (let i = 0; i < buttons.length; i++) {
   buttons[i].addEventListener('click', () => {
-    console.log(`Button ${i} clicked`) // logs 0, 1, 2, ...
-  })
+    console.log(`Button ${i} clicked`); // logs 0, 1, 2, ...
+  });
 }
 ```
 
@@ -60,10 +60,10 @@ for (let i = 0; i < buttons.length; i++) {
 ```typescript
 // Best: no loop variable to close over at all
 Array.from(buttons).forEach((btn, i) => {
-  btn.addEventListener('click', () => console.log(`Button ${i} clicked`))
-})
+  btn.addEventListener('click', () => console.log(`Button ${i} clicked`));
+});
 ```
 
 **Rule: never use `var`. Always use `const` by default, `let` only when reassignment is required.**
 
-Reference: [YDKJSY — Scope & Closures, Chapter 5](https://github.com/getify/You-Dont-Know-JS/blob/2nd-ed/scope-closures/ch5.md)
+Reference: [_You Don't Know JS Yet_](https://github.com/getify/you-dont-know-js) by Kyle Simpson — Scope & Closures, Chapter 5

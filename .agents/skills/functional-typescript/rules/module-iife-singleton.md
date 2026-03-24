@@ -17,45 +17,49 @@ Use an IIFE singleton when you need exactly one instance of a module with privat
 
 ```typescript
 const cache = {
-  store: new Map<string, unknown>(),   // public — anyone can clear it or corrupt it
-  get(key: string) { return this.store.get(key) },
-  set(key: string, val: unknown) { this.store.set(key, val) },
-}
+  store: new Map<string, unknown>(), // public — anyone can clear it or corrupt it
+  get(key: string) {
+    return this.store.get(key);
+  },
+  set(key: string, val: unknown) {
+    this.store.set(key, val);
+  },
+};
 
-cache.store.clear()  // invariant violated from outside
+cache.store.clear(); // invariant violated from outside
 ```
 
 **Correct (IIFE module — `store` is private):**
 
 ```typescript
 const cache = (() => {
-  const store = new Map<string, unknown>()   // private
+  const store = new Map<string, unknown>(); // private
 
   return {
     get<T>(key: string): T | undefined {
-      return store.get(key) as T | undefined
+      return store.get(key) as T | undefined;
     },
     set<T>(key: string, value: T): void {
-      store.set(key, value)
+      store.set(key, value);
     },
     has(key: string): boolean {
-      return store.has(key)
+      return store.has(key);
     },
     invalidate(key: string): void {
-      store.delete(key)
+      store.delete(key);
     },
     size(): number {
-      return store.size
+      return store.size;
     },
-  }
-})()
+  };
+})();
 
 // cache.store  // undefined — inaccessible
-cache.set('user:1', { name: 'Alice' })
-cache.get<{ name: string }>('user:1')  // { name: 'Alice' }
+cache.set('user:1', { name: 'Alice' });
+cache.get<{ name: string }>('user:1'); // { name: 'Alice' }
 ```
 
-**Three requirements for a valid classic module (from YDKJSY):**
+**Three requirements for a valid classic module (from [You Don't Know JS Yet](https://github.com/getify/you-dont-know-js)):**
 
 1. There must be an outer scope (the IIFE function body)
 2. The inner scope must have at least one piece of hidden state
@@ -68,20 +72,24 @@ cache.get<{ name: string }>('user:1')  // { name: 'Alice' }
 const MathUtils = {
   add: (a: number, b: number) => a + b,
   sub: (a: number, b: number) => a - b,
-}
+};
 
 // MODULE — hidden state accessed only through the API
 const idGenerator = (() => {
-  let next = 0
+  let next = 0;
   return {
-    generate(): string { return `id_${next++}` },
-    reset(): void     { next = 0 },
-  }
-})()
+    generate(): string {
+      return `id_${next++}`;
+    },
+    reset(): void {
+      next = 0;
+    },
+  };
+})();
 
-idGenerator.generate() // "id_0"
-idGenerator.generate() // "id_1"
+idGenerator.generate(); // "id_0"
+idGenerator.generate(); // "id_1"
 // idGenerator.next  // undefined
 ```
 
-Reference: [YDKJSY — Scope & Closures, Chapter 8](https://github.com/getify/You-Dont-Know-JS/blob/2nd-ed/scope-closures/ch8.md)
+Reference: [_You Don't Know JS Yet_](https://github.com/getify/you-dont-know-js) by Kyle Simpson — Scope & Closures, Chapter 8

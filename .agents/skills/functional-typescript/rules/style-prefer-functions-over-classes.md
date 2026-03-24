@@ -15,14 +15,18 @@ Classes introduce `this` — a runtime binding that changes based on how a funct
 
 ```typescript
 class Counter {
-  private count = 0
-  increment() { this.count++ }
-  value()     { return this.count }
+  private count = 0;
+  increment() {
+    this.count++;
+  }
+  value() {
+    return this.count;
+  }
 }
 
-const c = new Counter()
-const inc = c.increment         // detached method
-inc()                           // TypeError: Cannot read properties of undefined
+const c = new Counter();
+const inc = c.increment; // detached method
+inc(); // TypeError: Cannot read properties of undefined
 // or: count is not incremented — `this` is wrong context
 ```
 
@@ -30,45 +34,49 @@ inc()                           // TypeError: Cannot read properties of undefine
 
 ```typescript
 function makeCounter(initial = 0) {
-  let count = initial
+  let count = initial;
   return {
-    increment: () => { count++ },
-    value:     () => count,
-  }
+    increment: () => {
+      count++;
+    },
+    value: () => count,
+  };
 }
 
-const c   = makeCounter()
-const inc = c.increment   // safe to detach — closes over `count`, not `this`
-inc()
-c.value() // 1
+const c = makeCounter();
+const inc = c.increment; // safe to detach — closes over `count`, not `this`
+inc();
+c.value(); // 1
 ```
 
 **Incorrect (class method as callback loses `this`):**
 
 ```typescript
 class UserService {
-  private prefix = 'user_'
-  formatId(id: string) { return `${this.prefix}${id}` }
+  private prefix = 'user_';
+  formatId(id: string) {
+    return `${this.prefix}${id}`;
+  }
 }
 
-const svc = new UserService()
-['1', '2', '3'].map(svc.formatId)       // ['undefinedid1', ...] — `this` is undefined
-['1', '2', '3'].map(id => svc.formatId(id)) // workaround needed
+const svc = new UserService()[('1', '2', '3')]
+  .map(svc.formatId) // ['undefinedid1', ...] — `this` is undefined
+  [('1', '2', '3')].map((id) => svc.formatId(id)); // workaround needed
 ```
 
 **Correct (closure-based — no binding issues):**
 
 ```typescript
 function makeUserService(prefix = 'user_') {
-  const formatId = (id: string): string => `${prefix}${id}`
-  return { formatId }
+  const formatId = (id: string): string => `${prefix}${id}`;
+  return { formatId };
 }
 
-const svc = makeUserService()
-['1', '2', '3'].map(svc.formatId)  // ['user_1', 'user_2', 'user_3'] ✓
+const svc = makeUserService()[('1', '2', '3')].map(svc.formatId); // ['user_1', 'user_2', 'user_3'] ✓
 ```
 
 **When classes are appropriate:**
+
 - Implementing interfaces that require `instanceof` checks (e.g., `Error` subclasses)
 - Working with frameworks that require class syntax (NestJS, TypeORM decorators)
 - When inheritance hierarchies genuinely model your domain (rare)
@@ -76,4 +84,4 @@ const svc = makeUserService()
 
 **Rule:** default to factory functions. Reach for classes only when a framework requires them or when `instanceof` is needed for error handling.
 
-Reference: [YDKJSY — Objects & Classes, Chapter 3](https://github.com/getify/You-Dont-Know-JS/blob/2nd-ed/objects-classes/ch3.md)
+Reference: [_You Don't Know JS Yet_](https://github.com/getify/you-dont-know-js) by Kyle Simpson — Objects & Classes, Chapter 3

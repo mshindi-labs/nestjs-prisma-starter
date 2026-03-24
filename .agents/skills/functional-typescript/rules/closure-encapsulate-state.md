@@ -15,76 +15,88 @@ A closure preserves access to variables in its defining scope even after that sc
 
 ```typescript
 const counter = {
-  count: 0,              // public — anyone can set counter.count = -999
-  increment() { this.count++ },
-  value() { return this.count },
-}
+  count: 0, // public — anyone can set counter.count = -999
+  increment() {
+    this.count++;
+  },
+  value() {
+    return this.count;
+  },
+};
 
-counter.count = -999    // invariant violated
+counter.count = -999; // invariant violated
 ```
 
 **Correct (state is private via closure):**
 
 ```typescript
 function makeCounter(initial = 0) {
-  let count = initial     // private — inaccessible from outside
+  let count = initial; // private — inaccessible from outside
 
   return {
-    increment(): void { count++ },
-    decrement(): void { count-- },
-    reset(): void      { count = initial },
-    value(): number    { return count },
-  }
+    increment(): void {
+      count++;
+    },
+    decrement(): void {
+      count--;
+    },
+    reset(): void {
+      count = initial;
+    },
+    value(): number {
+      return count;
+    },
+  };
 }
 
-const counter = makeCounter()
-counter.increment()
-counter.value()     // 1
+const counter = makeCounter();
+counter.increment();
+counter.value(); // 1
 // counter.count   // undefined — private
 ```
 
 **Each closure instance has independent state:**
 
 ```typescript
-const a = makeCounter(0)
-const b = makeCounter(10)
+const a = makeCounter(0);
+const b = makeCounter(10);
 
-a.increment()
-a.increment()
+a.increment();
+a.increment();
 
-a.value() // 2
-b.value() // 10  — completely independent
+a.value(); // 2
+b.value(); // 10  — completely independent
 ```
 
 **Richer example — event emitter:**
 
 ```typescript
-type Listener<T> = (event: T) => void
+type Listener<T> = (event: T) => void;
 
 function makeEmitter<T>() {
-  const listeners = new Set<Listener<T>>()   // private
+  const listeners = new Set<Listener<T>>(); // private
 
   return {
     on(listener: Listener<T>): () => void {
-      listeners.add(listener)
-      return () => listeners.delete(listener) // returns unsubscribe fn
+      listeners.add(listener);
+      return () => listeners.delete(listener); // returns unsubscribe fn
     },
     emit(event: T): void {
-      listeners.forEach(fn => fn(event))
+      listeners.forEach((fn) => fn(event));
     },
     listenerCount(): number {
-      return listeners.size
+      return listeners.size;
     },
-  }
+  };
 }
 
-const emitter = makeEmitter<string>()
-const off = emitter.on(msg => console.log(msg))
-emitter.emit('hello')   // logs "hello"
-off()
-emitter.emit('world')   // no listeners
+const emitter = makeEmitter<string>();
+const off = emitter.on((msg) => console.log(msg));
+emitter.emit('hello'); // logs "hello"
+off();
+emitter.emit('world'); // no listeners
 ```
 
 The `listeners` Set is completely private — callers can only interact with it through the controlled API.
 
-Reference: [YDKJSY — Scope & Closures, Chapter 7](https://github.com/getify/You-Dont-Know-JS/blob/2nd-ed/scope-closures/ch7.md)
+Reference: [_You Don't Know JS Yet_](https://github.com/getify/you-dont-know-js) by Kyle Simpson — Scope & Closures, Chapter 7
